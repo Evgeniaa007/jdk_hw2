@@ -45,7 +45,6 @@ public class ServerWindow extends JFrame implements ServerView{
         JPanel serverW = new JPanel(new GridLayout(1, 2));
         btnStart = new JButton("Start");
         btnStop = new JButton("Stop");
-        btnStart.addActionListener(actionP);
         btnStart.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -73,37 +72,3 @@ public class ServerWindow extends JFrame implements ServerView{
         this.server = server;
     }
 }
-
-/*        btnStart.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(isServerWorking){
-                    appendLog("Сервер уже запущен.");
-                }
-                else{
-                    isServerWorking = true;
-                    appendLog("Сервер запущен!");
-                }
-            }
-        });
-        btnStop.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(!isServerWorking) {
-                    appendLog("Работа сервера остановлена.");
-                }
-                else{
-                    isServerWorking = false;
-                    while(!clients.isEmpty()){
-                        disconnectClient(clients.get(clients.size()-1));
-                    }
-                }
-                appendLog("Сервер остановлен!");
-            }
-        });*/
-
-
-
-
-
-

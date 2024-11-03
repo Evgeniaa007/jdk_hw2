@@ -1,5 +1,6 @@
 package client;
 
+import server.Server;
 import server.ServerWindow;
 
 import javax.swing.*;
@@ -21,19 +22,16 @@ public class ClientGUI extends JFrame implements ClientView {
     private Client client;
 
 
-    public ClientGUI(ServerWindow serverWindow) {
-        this.client = new Client(this, server.getServer());
-
-        setSize(WIDTH, HEIGHT);
-        setResizable(false);
-        setTitle("Chat client");
-        setLocation(serverWindow.getX() - 500, serverWindow.getY());
+    public ClientGUI(Server server) {
+        windowSettings();
         createClientWin();
         setVisible(true);
     }
 
-    public void appendLog(String text){
-        log.append(text + "\n");
+    private void windowSettings(){
+        setSize(WIDTH, HEIGHT);
+        setResizable(false);
+        setTitle("Chat client");
     }
 
     //верхняя часть окна клиента
@@ -68,6 +66,10 @@ public class ClientGUI extends JFrame implements ClientView {
         return new JScrollPane(log);
     }
 
+    public void appendLog(String text){
+        log.append(text + "\n");
+    }
+
     //нижняя часть окна клиента, связанная с наббором и отправкой сообщений
     private Component createBottomPanel(){
         bottomPanel = new JPanel(new BorderLayout());
@@ -85,7 +87,7 @@ public class ClientGUI extends JFrame implements ClientView {
                 sendMessage();
             }
         });
-        btnSend.addKeyListener(new KeyAdapter() {
+        messageField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
                 if(e.getKeyChar() == '\n'){
@@ -129,7 +131,7 @@ public class ClientGUI extends JFrame implements ClientView {
     protected void processWindowEvent(WindowEvent e) {
         super.processWindowEvent(e);
         if(e.getID() == WindowEvent.WINDOW_CLOSING){
-            disconnectFromServer();
+            disconnected();
         }
     }
 
@@ -137,4 +139,15 @@ public class ClientGUI extends JFrame implements ClientView {
     public void sendMessage(String message) {
        appendLog(message);
     }
+
+    @Override
+    public void disconnected() {
+        topPanel.setVisible(true);
+    }
+
+    @Override
+    public void setClientController(Client client) {
+        this.client = client;
+    }
+
 }

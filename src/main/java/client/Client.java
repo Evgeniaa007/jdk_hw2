@@ -6,24 +6,27 @@ import server.Server;
 public class Client {
     private Server server;
     private boolean connected;
-    private String name;
+    private String login;
     ClientView view; // для связки с ClientGUI
 
     public Client(ClientView view, Server server){
         this.view = view;
         this.server = server;
+        view.setClientController(this);
+    }
+
+    public String getLogin(){
+        return login;
     }
 
     // подключает пользователя при условии работы сервера
-    public boolean connectToServer(String name){
-        this.name = name;
+    public boolean connectToServer(String login){
+        this.login = login;
         if(server.loginClient(this)){
             connected = true;
-            topPanel.setVisible(false);
             printText("Вы успешно подключились!");
-            name = loginField.getText();
-            server.printText(name + " успешно подключился к беседе.");
-            String log = serverWindow.getLog();
+            server.printText(getLogin() + " успешно подключился к беседе.");
+            String log = server.getLog();
             if (log != null){
                 printText(log);
             }
@@ -38,18 +41,16 @@ public class Client {
     public void disconnect(){
         if(connected){
             connected = false;
-            view.disconnectFromServer();
+            view.disconnected();
             server.disconnectClient(this);
             printText("Вы были отключены от сервера");
         }
     }
-//мы посылаем
+    //мы посылаем
     public void answer(String message){
         if(connected){
             if(!message.isEmpty()){
-                server.sendMessage(name + ": " + message);
-             //   String message = messageField.getText()
-                // messageField.setText("");
+                server.message(getLogin() + ": " + message);
             }
 
         }
@@ -58,11 +59,7 @@ public class Client {
         }
     }
 // нам посылают
-    private void printText(String text){
+    public void printText(String text){
         view.sendMessage(text);
-    }
-
-    public void serverAnswer(String answer){
-        printText(answer);
     }
 }

@@ -1,2 +1,7 @@
 Ivan_Igorevich: gggg
 Ivan: ggg
+Roman: Как дела?
+Ivan_Igorevich: Хорошо
+Roman: отлично
+Ivan: Добрф
+Ivan_Igorevich: Ой

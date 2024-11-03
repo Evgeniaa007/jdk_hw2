@@ -1,6 +1,7 @@
 package server;
 
-import client.ClientGUI;
+import client.Client;
+import server.repository.FileOperations;
 import server.repository.Repository;
 
 import java.util.ArrayList;
@@ -8,46 +9,38 @@ import java.util.ArrayList;
 public class Server {
 
     private boolean isServerWorking;
-    private ArrayList<ClientGUI> clients; //для добавления пользователей и работы с ними
+    private ArrayList<Client> clients; //для добавления пользователей и работы с ними
     private ServerView view;
     private Repository repository;
 
     public Server(ServerView view) {
         this.view = view;
+        repository = new FileOperations();
+        clients = new ArrayList<>();
+        view.setServer(this);
+    }
+
+    public void printText(String text){
+        view.sendMessage(text);
     }
 
     //метод, позволяющий отображать сообщения, а также сохранять их в файл
     public void message(String text){
         if (isServerWorking) {
-            text += "";
-            appendLog(text);
+            printText(text);
             totalDisplay(text);
-            saveLog(text);
+            repository.saveLog(text);
         }
-
     }
 
     private void totalDisplay(String text){
-        for (ClientGUI client: clients){
-            client.appendLog(text);
+        for (Client client: clients){
+            client.printText(text);
         }
     }
 
-    public void  disconnectClient(ClientGUI clientGUI){
-        clients.remove(clientGUI);
-        if (clients != null){
-            clientGUI.disconnectFromServer();
-        }
-
-    }
-
-
-    // получение записей из файла
-    public String getLog() {
-        return readLog();
-    }
     // при работе сервера добавляет клиента в список для дальнейшей работы
-    public boolean loginClient(ClientGUI client){
+    public boolean loginClient(Client client){
         if(isServerWorking){
             clients.add(client);
             return true;
@@ -57,12 +50,44 @@ public class Server {
         }
     }
 
-
-    //Метод добавления текста в окне сервера
-    public void appendLog(String text){
-        log.append(text + "\n");
+    public void disconnectClient(Client client){
+        clients.remove(client);
+        if (clients != null){
+            client.disconnect();
+        }
     }
 
+    public void saveLog(String text){
+        repository.saveLog(text);
+    }
 
+    // получение записей из файла
+    public String getLog() {
+        return repository.readLog();
+    }
 
+    // подключение сервера
+    public void connect(){
+        if(isServerWorking){
+            printText("Сервер уже запущен.");
+        }
+        else{
+            isServerWorking = true;
+            printText("Сервер запущен!");
+        }
+    }
+
+    // отключение сервера
+    public void disconnect(){
+        if(!isServerWorking) {
+            printText("Работа сервера остановлена.");
+        }
+        else{
+            isServerWorking = false;
+            while(!clients.isEmpty()){
+                disconnectClient(clients.get(clients.size()-1));
+            }
+        }
+        printText("Сервер остановлен!");
+    }
 }
